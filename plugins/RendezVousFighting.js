@@ -17,7 +17,7 @@ function dbConnect() {
     });                                     // process asynchronous requests in the meantime.
                                             // If you're also serving http, display a 503 error.
     db.on('error', function (err) {
-        console.log('db error', err);
+        //console.log('db error', err);
         if (err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
             dbConnect();                         // lost due to either server restart, or a
         } else {                                      // connnection idle timeout (the wait_timeout
@@ -28,22 +28,22 @@ function dbConnect() {
 
 dbConnect();
 
-var CommandHandler = (function () {
-    function CommandHandler(fChatLib, chan) {
-        this.fChatLibInstance = fChatLib;
-        this.channel = chan;
-        _this = this;
-    }
 
+
+var CommandHandler = function (fChatLib, chan) {
+
+    this.fChatLibInstance = fChatLib;
+    this.channel = chan;
+    _this = this;
     //Public
 
     CommandHandler.prototype.stats = function (args, data) {
-        statsGetter(args, data, data.character);
+        statsGetter(data.character, data.character);
     };
 
-    CommandHandler.prototype.getStats = function (args, data) {
+    CommandHandler.prototype.getstats = function (args, data) {
         if (_this.fChatLibInstance.isUserChatOP(data.character, _this.channel)) {
-            statsGetter(this, args, data, args);
+            statsGetter(args, data.character);
         }
         else {
             _this.fChatLibInstance.sendMessage("You don't have sufficient rights.", _this.channel);
@@ -94,10 +94,10 @@ var CommandHandler = (function () {
 
     function checkIfValidStats(arrParam) {
         if (arrParam.length != 6) {
-            _this.fChatLibInstance.sendMessage("The number of parameters was incorrect. Example: !register 4,7,5,1,6,30", _this.channel);
+            _this.fChatLibInstance.sendMessage("The number of parameters was incorrect. Example: !register 5,7,5,0,6,30", _this.channel);
         }
         else if (!arrParam.every(arg => isInt(arg))) {
-            _this.fChatLibInstance.sendMessage("All the parameters aren't integers. Example: !register 4,7,5,1,6,30", _this.channel);
+            _this.fChatLibInstance.sendMessage("All the parameters aren't integers. Example: !register 5,7,5,0,6,30", _this.channel);
         }
         else {
             //register
@@ -107,25 +107,25 @@ var CommandHandler = (function () {
                 return parseInt(a) + parseInt(b);
             }, 0);
             if (total != defaultStatPoints) {
-                _this.fChatLibInstance.sendMessage("The total of points you've spent isn't equal to "+defaultStatPoints+". (" + total + "). Example: !register 4,7,5,1,6,30", _this.channel);
+                _this.fChatLibInstance.sendMessage("The total of points you've spent isn't equal to "+defaultStatPoints+". (" + total + "). Example: !register 5,7,5,0,6,30", _this.channel);
             }
-            else if (parseInt(arrParam[0]) > 10 || (parseInt(arrParam[0]) < 1)) {
-                _this.fChatLibInstance.sendMessage("The Strength stat must be higher than 0 and lower than 11. Example: !register 4,7,5,1,6,30", _this.channel);
+            else if (parseInt(arrParam[0]) > 10 || (parseInt(arrParam[0]) < 0)) {
+                _this.fChatLibInstance.sendMessage("The Strength stat has a minimum value of 0 and a maximum value of 10. Example: !register 5,7,5,0,6,30", _this.channel);
             }
-            else if (parseInt(arrParam[1]) > 10 || (parseInt(arrParam[1]) < 1)) {
-                _this.fChatLibInstance.sendMessage("The Dexterity stat must be higher than 0 and lower than 11. Example: !register 4,7,5,1,6,30", _this.channel);
+            else if (parseInt(arrParam[1]) > 10 || (parseInt(arrParam[1]) < 0)) {
+                _this.fChatLibInstance.sendMessage("The Dexterity stat has a minimum value of 0 and a maximum value of 10. Example: !register 5,7,5,0,6,30", _this.channel);
             }
-            else if (parseInt(arrParam[2]) > 10 || (parseInt(arrParam[2]) < 1)) {
-                _this.fChatLibInstance.sendMessage("The Endurance stat must be higher than 0 and lower than 11. Example: !register 4,7,5,1,6,30", _this.channel);
+            else if (parseInt(arrParam[2]) > 10 || (parseInt(arrParam[2]) < 0)) {
+                _this.fChatLibInstance.sendMessage("The Endurance stat has a minimum value of 0 and a maximum value of 10. Example: !register 5,7,5,0,6,30", _this.channel);
             }
-            else if (parseInt(arrParam[3]) > 10 || (parseInt(arrParam[3]) < 1)) {
-                _this.fChatLibInstance.sendMessage("The Spellpower stat must be higher than 0 and lower than 11. Example: !register 4,7,5,1,6,30", _this.channel);
+            else if (parseInt(arrParam[3]) > 10 || (parseInt(arrParam[3]) < 0)) {
+                _this.fChatLibInstance.sendMessage("The Spellpower stat has a minimum value of 0 and a maximum value of 10. Example: !register 5,7,5,0,6,30", _this.channel);
             }
-            else if (parseInt(arrParam[4]) > 10 || (parseInt(arrParam[4]) < 1)) {
-                _this.fChatLibInstance.sendMessage("The Willpower stat must be higher than 0 and lower than 11. Example: !register 4,7,5,1,6,30", _this.channel);
+            else if (parseInt(arrParam[4]) > 10 || (parseInt(arrParam[4]) < 0)) {
+                _this.fChatLibInstance.sendMessage("The Willpower stat has a minimum value of 0 and a maximum value of 10. Example: !register 5,7,5,0,6,30", _this.channel);
             }
             else if (parseInt(arrParam[5]) < 0 || parseInt(arrParam[5]) > 100) {
-                _this.fChatLibInstance.sendMessage("The starting cloth stat can't be higher than 100 or lower than 0. Example: !register 4,7,5,1,6,30", _this.channel);
+                _this.fChatLibInstance.sendMessage("The starting cloth stat can't be higher than 100 or lower than 0. Example: !register 5,7,5,0,6,30", _this.channel);
             }
             else {
                 return true;
@@ -162,25 +162,25 @@ var CommandHandler = (function () {
         });
     };
 
-    var statsGetter = function (args, data, character) {
-        db.query("SELECT name, strength, dexterity, endurance, spellpower, willpower, cloth FROM `flistplugins`.`RDVF_stats` WHERE name = ? LIMIT 1", data.character, function (err, rows, fields) {
+    var statsGetter = function (characterAsked, askingCharacter) {
+        db.query("SELECT name, strength, dexterity, endurance, spellpower, willpower, cloth FROM `flistplugins`.`RDVF_stats` WHERE name = ? LIMIT 1", characterAsked, (err, rows, fields) => {
             if (rows != undefined && rows.length == 1) {
                 var hp = 100;
                 if (rows[0].endurance > 4) {
                     hp += (parseInt(rows[0].endurance) - 4) * 10;
                 }
                 var stats = rows[0];
-                var mana = (parseInt(rows[0].willpower) * 10 + 60);
-                var staminaMax = (parseInt(rows[0].willpower) * 10 + 60);
-                _this.fChatLibInstance.sendPrivMessage("[b]" + data.character + "[/b]'s stats" + "\n" +
+                var mana = (parseInt(rows[0].willpower) * 10 + 60 + (parseInt(rows[0].spellpower) * 5 - (parseInt(rows[0].strength) * 5)));
+                var staminaMax = (parseInt(rows[0].willpower) * 10 + 60 - (parseInt(rows[0].spellpower) * 5 - (parseInt(rows[0].strength) * 5)));
+                _this.fChatLibInstance.sendPrivMessage("[b]" + stats.name + "[/b]'s stats" + "\n" +
                     "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Hit Points[/color][/b]: " + hp + "\n" +
                     "[b][color=orange]Dexterity[/color][/b]:  " + stats.dexterity + "      " + "[b][color=pink]Mana[/color][/b]: " + mana + "\n" +
                     "[b][color=green]Endurance[/color][/b]:  " + stats.endurance + "      " + "[b][color=pink]Stamina[/color][/b]: " + staminaMax + "\n" +
                     "[b][color=cyan]Spellpower[/color][/b]:    " + stats.spellpower + "      " + "[b][color=pink]Cloth[/color][/b]: " + stats.cloth + "\n" +
-                    "[b][color=purple]Willpower[/color][/b]: " + stats.willpower, data.character);
+                    "[b][color=purple]Willpower[/color][/b]: " + stats.willpower, askingCharacter);
             }
             else {
-                _this.fChatLibInstance.sendPrivMessage("You aren't registered yet.", data.character);
+                _this.fChatLibInstance.sendPrivMessage("You aren't registered yet.", askingCharacter);
             }
         });
     };
@@ -222,8 +222,8 @@ var CommandHandler = (function () {
                         hp += (currentFighters[0].endurance - 4) * 10;
                     }
                     currentFighters[0].hp = hp;
-                    currentFighters[0].mana = (parseInt(currentFighters[0].willpower) * 10 + 60 + (parseInt(currentFighters[0].spellpower) * 5 - (parseInt(currentFighters[0].strength) * 5);
-                    currentFighters[0].stamina = (parseInt(currentFighters[0].willpower) * 10 + 60 - (parseInt(currentFighters[0].spellpower) * 5 + (parseInt(currentFighters[0].strength) * 5);
+                    currentFighters[0].mana = (parseInt(currentFighters[0].willpower) * 10 + 60 + (parseInt(currentFighters[0].spellpower) * 5 - (parseInt(currentFighters[0].strength) * 5)));
+                    currentFighters[0].stamina = (parseInt(currentFighters[0].willpower) * 10 + 60 - (parseInt(currentFighters[0].spellpower) * 5 - (parseInt(currentFighters[0].strength) * 5)));
                     _this.fChatLibInstance.sendMessage(data.character + " is the first one to step in the ring, ready to fight! Who will be the lucky opponent?", _this.channel);
                 }
                 else {
@@ -246,8 +246,8 @@ var CommandHandler = (function () {
                             hp += (currentFighters[1].endurance - 4) * 10;
                         }
                         currentFighters[1].hp = hp;
-                        currentFighters[1].mana = (parseInt(currentFighters[1].willpower) * 10 + 60 + (parseInt(currentFighters[1].spellpower) * 5 - (parseInt(currentFighters[1].strength) * 5);
-                        currentFighters[1].stamina = (parseInt(currentFighters[1].willpower) * 10 + 60 - (parseInt(currentFighters[1].spellpower) * 5 + (parseInt(currentFighters[1].strength) * 5);
+                        currentFighters[1].mana = (parseInt(currentFighters[1].willpower) * 10 + 60 + (parseInt(currentFighters[1].spellpower) * 5 - (parseInt(currentFighters[1].strength) * 5)));
+                        currentFighters[1].stamina = (parseInt(currentFighters[1].willpower) * 10 + 60 - (parseInt(currentFighters[1].spellpower) * 5 - (parseInt(currentFighters[1].strength) * 5)));
                         _this.fChatLibInstance.sendMessage(data.character + " accepts the challenge! Let's get it on!", _this.channel);
                     }
                     else {
@@ -282,7 +282,7 @@ var CommandHandler = (function () {
                 }
                 if ((currentFighters.length == 1 && isFirst) || (currentFighters[0].exit == true && currentFighters[1].exit == true)) {
                     _this.fChatLibInstance.sendMessage("The fight has been ended.", _this.channel);
-                    setTimeout(resetFight(), 2500);
+                    setTimeout(resetFight, 2500);
                 }
                 else {
                     _this.fChatLibInstance.sendMessage("The fight will end if your opponent types !exit too.", _this.channel);
@@ -297,7 +297,7 @@ var CommandHandler = (function () {
         }
     };
     CommandHandler.prototype.leave = CommandHandler.prototype.exit;
-    CommandHandler.prototype.leaveFight = CommandHandler.prototype.exit;
+    CommandHandler.prototype.leavefight = CommandHandler.prototype.exit;
     CommandHandler.prototype.quit = CommandHandler.prototype.exit;
     CommandHandler.prototype.unready = CommandHandler.prototype.exit;
 
@@ -412,12 +412,12 @@ var CommandHandler = (function () {
         attackFunc("Spell", data.character);
     };
 
-    CommandHandler.prototype.manaSurge = function (args, data) {
+    CommandHandler.prototype.manasurge = function (args, data) {
         attackFunc("Channel", data.character);
     };
 
-    CommandHandler.prototype.surge = CommandHandler.prototype.manaSurge;
-    CommandHandler.prototype.mana = CommandHandler.prototype.manaSurge;
+    CommandHandler.prototype.surge = CommandHandler.prototype.manasurge;
+    CommandHandler.prototype.mana = CommandHandler.prototype.manasurge;
 
     CommandHandler.prototype.teleport = function (args, data) {
         attackFunc("Teleport", data.character);
@@ -431,14 +431,9 @@ var CommandHandler = (function () {
         attackFunc("Rip", data.character);
     };
     CommandHandler.prototype.ripclothes = CommandHandler.prototype.rip;
-
-    return CommandHandler;
-}());
-
-module.exports = function (parent, channel) {
-    var cmdHandler = new CommandHandler(parent, channel);
-    return cmdHandler;
 };
+
+module.exports.CommandHandler = CommandHandler;
 
 
 var currentFighters = [];
@@ -1413,7 +1408,7 @@ fighter.prototype = {
     },
 
     getStatBlock: function () {
-        return "[color=cyan]" + this.name + " stats: Strength:" + this.strength() + " Dexterity:" + this.dexterity() + " Endurance:" + this.endurance() + " Spellpower:" + this.spellpower() + " Willpower:" + this.willpower() + "[/color]";
+        return "[color=cyan]" + this.name + " stats: Strength:" + this.strength() + " Dexterity:" + this.dexterity() + " Resilience:" + this.endurance() + " Spellpower:" + this.spellpower() + " Willpower:" + this.willpower() + "[/color]";
     },
 
     getStatus: function () {
@@ -1537,7 +1532,7 @@ fighter.prototype = {
     actionLight: function (roll) {
         var attacker = this;
         var target = battlefield.getTarget();
-        var damage = roll / 2 + attacker.strength();
+        var damage = roll - 5 + attacker.strength();
         var requiredStam = 20;
         var difficulty = 4;
         
@@ -1685,7 +1680,7 @@ fighter.prototype = {
     actionGrab: function (roll) {
         var attacker = this;
         var target = battlefield.getTarget();
-        var damage = (roll / 4) + (attacker.strength() / 2);
+        var damage = roll - 10 + (attacker.strength() / 2);
         var requiredStam = 20;
         if (attacker.isGrappling(target)) {
             damage = roll + (attacker.strength() * 2);
@@ -1830,7 +1825,7 @@ fighter.prototype = {
     actionTackle: function (roll) {
         var attacker = this;
         var target = battlefield.getTarget();
-        var damage = roll /2 + attacker.strength();
+        var damage = roll - 5 + attacker.strength();
         var requiredStam = 40;
         var difficulty = 8; //Base difficulty, rolls greater than this amount will hit.
 
@@ -2074,7 +2069,7 @@ fighter.prototype = {
     actionHex: function (roll) {
         var attacker = this;
         var target = battlefield.getTarget();
-        var damage = roll / 2 + target.hasMagicWeakness + attacker.spellpower();
+        var damage = roll - 5 + target.hasMagicWeakness + attacker.spellpower();
         var requiredMana = 20;
         var difficulty = 6; //Base difficulty, rolls greater than this amount will hit.
         
@@ -2768,11 +2763,11 @@ function combatInput(actionMade) {
 
 
     // Fumble on a bad roll, act on a good roll. Each attack deteremines its own method of resolving hits vs. misses.
-    if (roll > 1) {
+//    if (roll > 1) {
         actor["action" + action](roll);
-    } else {
-        actor.actionFumble(action);
-    }
+//    } else {
+//        actor.actionFumble(action);
+//    }
 
     windowController.addInfo("Raw Dice Roll: " + roll);
     windowController.addInfo(actor.name + "'s Average Dice Roll: " + luck);

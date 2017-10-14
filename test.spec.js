@@ -1,5 +1,6 @@
 var Jasmine = require('jasmine');
 var jasmine = new Jasmine();
+var cmd = require('./plugins/RendezVousFighting');
 
 describe("Fighter testing", () => {
     var fChatLibInstance;
@@ -17,7 +18,7 @@ describe("Fighter testing", () => {
                 console.log("Sent PRIVMESSAGE "+message + " to "+character);
             }
         };
-        CommandHandler = new require('./plugins/RendezVousFighting')(fChatLibInstance, "RDVTestChan");
+        CommandHandler = new cmd.CommandHandler(fChatLibInstance, "RDVTestChan");
     });
 
     it("should start the match", function(done){
@@ -100,6 +101,13 @@ describe("Fighter testing", () => {
             }, 1000);
             setTimeout(function () {
                 CommandHandler.tackle("", {character: "Britta Blixt", channel: "here"});
+            }, 1000);
+
+            setTimeout(function () {
+                CommandHandler.manaSurge("", {character: "Aelith Blanchette", channel: "here"});
+            }, 1000);
+            setTimeout(function () {
+                CommandHandler.manaSurge("", {character: "Britta Blixt", channel: "here"});
             }, 1000);
 
             setTimeout(function () {
