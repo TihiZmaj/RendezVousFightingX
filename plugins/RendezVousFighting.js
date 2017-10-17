@@ -116,7 +116,7 @@ var CommandHandler = function (fChatLib, chan) {
                 _this.fChatLibInstance.sendMessage("The Dexterity stat has a minimum value of 0 and a maximum value of 10. Example: !register 5,7,5,0,6,30", _this.channel);
             }
             else if (parseInt(arrParam[2]) > 10 || (parseInt(arrParam[2]) < 0)) {
-                _this.fChatLibInstance.sendMessage("The Endurance stat has a minimum value of 0 and a maximum value of 10. Example: !register 5,7,5,0,6,30", _this.channel);
+                _this.fChatLibInstance.sendMessage("The Resilience stat has a minimum value of 0 and a maximum value of 10. Example: !register 5,7,5,0,6,30", _this.channel);
             }
             else if (parseInt(arrParam[3]) > 10 || (parseInt(arrParam[3]) < 0)) {
                 _this.fChatLibInstance.sendMessage("The Spellpower stat has a minimum value of 0 and a maximum value of 10. Example: !register 5,7,5,0,6,30", _this.channel);
@@ -175,7 +175,7 @@ var CommandHandler = function (fChatLib, chan) {
                 _this.fChatLibInstance.sendPrivMessage("[b]" + stats.name + "[/b]'s stats" + "\n" +
                     "[b][color=red]Strength[/color][/b]:  " + stats.strength + "      " + "[b][color=red]Hit Points[/color][/b]: " + hp + "\n" +
                     "[b][color=orange]Dexterity[/color][/b]:  " + stats.dexterity + "      " + "[b][color=pink]Mana[/color][/b]: " + mana + "\n" +
-                    "[b][color=green]Endurance[/color][/b]:  " + stats.endurance + "      " + "[b][color=pink]Stamina[/color][/b]: " + staminaMax + "\n" +
+                    "[b][color=green]Resilience[/color][/b]:  " + stats.endurance + "      " + "[b][color=pink]Stamina[/color][/b]: " + staminaMax + "\n" +
                     "[b][color=cyan]Spellpower[/color][/b]:    " + stats.spellpower + "      " + "[b][color=pink]Cloth[/color][/b]: " + stats.cloth + "\n" +
                     "[b][color=purple]Willpower[/color][/b]: " + stats.willpower, askingCharacter);
             }
@@ -1264,7 +1264,7 @@ fighter.prototype = {
         var total = this._strength;
         if (this.isDisoriented > 0) total -= 1;
         //if (this.isRestrained) total -= 2;
-        total = Math.max(total, 1);
+        //total = Math.max(total, 1);
         total = Math.ceil(total);
         return total;
     },
@@ -1273,7 +1273,7 @@ fighter.prototype = {
         var total = this._dexterity;
         if (this.isDisoriented > 0) total -= 1;
         //if (this.isRestrained) total -= 2;
-        total = Math.max(total, 1);
+        //total = Math.max(total, 1);
         total = Math.ceil(total);
         return total;
     },
@@ -1281,7 +1281,7 @@ fighter.prototype = {
     endurance: function () {
         var total = this._endurance;
         if (this.isDisoriented > 0) total -= 1;
-        total = Math.max(total, 1);
+        //total = Math.max(total, 1);
         total = Math.ceil(total);
         return total;
     },
@@ -1289,7 +1289,7 @@ fighter.prototype = {
     spellpower: function () {
         var total = this._spellpower;
         if (this.isDisoriented > 0) total -= 1;
-        total = Math.max(total, 1);
+        //total = Math.max(total, 1);
         total = Math.ceil(total);
         return total;
     },
@@ -1297,7 +1297,7 @@ fighter.prototype = {
     willpower: function () {
         var total = this._willpower;
         if (this.isDisoriented > 0) total -= 1;
-        total = Math.max(total, 1);
+        //total = Math.max(total, 1);
         total = Math.ceil(total);
         return total;
     },
